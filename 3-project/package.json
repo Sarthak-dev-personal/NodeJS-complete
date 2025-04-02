@@ -1,0 +1,19 @@
+{
+  "name": "3-project",
+  "version": "1.0.0",
+  "description": "Mern Stack practice application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev-start": "nodemon src/app.js"
+  },
+  "keywords": [
+    "NodeJS",
+    "Javascrip"
+  ],
+  "author": "Sarthak Kapoor",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
