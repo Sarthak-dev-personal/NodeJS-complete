@@ -76,7 +76,26 @@ app.get('/.*abc$/', (request, response) => {
  * The generic request handler should always be the last handler as it'll match
  * any specific route case as well and return the response even if we have a route handler for the exact path implemented.
  */
-app.use((request, response) => response.send('Hello from first route handler'));
+//app.use((request, response) => response.send('Hello from first route handler'));
+
+/**
+ * Error Handling using app.use.
+ * We can make use of the error request param with a generic '/' url to throw error for each middleware.
+ */
+
+app.use('/admin', (request, response) => {
+    throw new Error('ABCD');
+});
+
+app.use('/user', (request, response) => {
+    throw new Error('sdfsdffgffg');
+})
+
+app.use('/', (error, request, response, next) => {
+    if (error) {
+        response.status(500).send('Something went wrong, please try again');
+    }
+})
 
 // Listen to incoming requests at port 3000.
 app.listen(3000, () => console.log('Server is now listening at port 3000'));
