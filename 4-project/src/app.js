@@ -17,11 +17,11 @@ app.post('/signup', async (request, response) => {
     try {
         const newUser = new UserModel(request.body); // Replaced the harcoded object with the data object received as part of the request body.
 
-        await newUser.save(); // Push Data in the collection.
+        const user = await newUser.save(); // Push Data in the collection.
 
-        response.send(request.body);
+        response.send(user);
     } catch (e) {
-        response.status(500).send(e);
+        response.status(500).send(e.message);
     };
 });
 
@@ -90,18 +90,37 @@ app.delete('/user', async (request, response) => {
 app.patch('/user', async (request, response) => {
     const dataToPatch = request.body;
 
+    const fieldsAllowedToUpdate = [
+        "id", // Usually not allowed to update. Kept here for learning purpose. Could have been passed as a request param.
+        "firstName",
+        "lastName",
+        "gender",
+        "age",
+        "skills",
+    ];
+
     try {
         if (!dataToPatch) {
-            response.status(400).send("Invalid Request");
+            /* response.status(400).send("Invalid Request");
 
-            return;
+            return; */
+            throw new Error("Invalid Request");
+        }
+
+        // Eg. of applying API level validation.
+        const isUpdateAllowed = Object.keys(dataToPatch).every(key => fieldsAllowedToUpdate.includes(key));
+
+        if (!isUpdateAllowed) {
+            throw new Error("Some fields present in the request are not allowed to be updated");
         }
 
         /**
          * The findByIdAndUpdate method takes various options as well, apart from ID and data to update.\
          * Eg. await UserModel.findByIdAndUpdate({_id: dataToPatch.id}, dataToPatch, { returnDocument: "after" }); // This'll return the updated user object post updating the data. By default it returns before updating the document i.e the old data.
+         * The validtors don't run on update requests by default. To enable this we need to pass an additional
+         * parameter 'runValidators' to the update method.
          */
-        const updatedUser = await UserModel.findByIdAndUpdate({ _id: dataToPatch.id }, dataToPatch);
+        const updatedUser = await UserModel.findByIdAndUpdate({ _id: dataToPatch.id }, dataToPatch, { runValidators: true });
 
         if (updatedUser) {
             response.send({
@@ -109,10 +128,10 @@ app.patch('/user', async (request, response) => {
                 updatedUser,
             });
         } else {
-            response.status(404).send("Used with the selected ID not found!!");
+            response.status(404).send("User with the selected ID not found!!");
         }
     } catch (error) {
-        response.status(500).send("Something went wrong, please try again!!");
+        response.status(500).send(error.message);
     }
 });
 
