@@ -1,8 +1,18 @@
 const express = require('express');
-const connectToDb = require('./config/database');
+const bcrypt = require('bcrypt');
 
 // Model Imports.
 const UserModel = require('./models/user');
+
+// Util method imports.
+const connectToDb = require('./config/database');
+
+const {
+    validateSignUpRequestBody,
+    validateLoginRequestBody,
+} = require('./utils/validate-signup-request');
+
+const encryptPassword = require('./utils/encrypt-password');
 
 const app = express();
 
@@ -14,15 +24,69 @@ app.use(express.json()); // Equivalent to app.use('/', express.json());
 
 // API to add a new user to DB.
 app.post('/signup', async (request, response) => {
+    const {
+        firstName,
+        lastName,
+        emailId,
+        password,
+        age,
+        gender,
+        skills,
+    } = request.body;
+
     try {
-        const newUser = new UserModel(request.body); // Replaced the harcoded object with the data object received as part of the request body.
+        if (validateSignUpRequestBody(request.body)) {
+            const passwordHash = await encryptPassword(password);
 
-        const user = await newUser.save(); // Push Data in the collection.
+            // Replaced the harcoded object with the data object received as part of the request body.
+            const newUser = new UserModel({
+                firstName,
+                lastName,
+                emailId,
+                password: passwordHash,
+                age,
+                gender,
+                skills,
+            });
 
-        response.send(user);
+            const user = await newUser.save(); // Push Data in the collection.
+
+            response.send(user); // Ideally we should return some fixed string for the password instead of returning the hash saved in the DB.
+        }
     } catch (e) {
         response.status(500).send(e.message);
     };
+});
+
+// Login API.
+app.post('/login', async(request, response) => {
+    const {
+        emailId,
+        password,
+    } = request.body;
+
+    try {
+        if (validateLoginRequestBody(request.body)) {
+            const user = await UserModel.findOne({ emailId });
+
+            if (!user) {
+                throw new Error("User not found!!");
+            }
+
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordValid) {
+                throw new Error("Invalid password!!");
+            }
+
+            response.send({
+                message: "User logged in successfully.",
+                user,
+            });
+        }
+    } catch (error) {
+        response.status(500).send(error.message);
+    }
 });
 
 // API to get a particular user from the DB.
