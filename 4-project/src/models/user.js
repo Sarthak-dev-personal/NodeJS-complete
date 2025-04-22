@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator'); // This is an external library tasked with providing common inbuilt validator functions.
+const jwtToken = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -50,6 +52,18 @@ const userSchema = new mongoose.Schema({
 }, {
     timestamps: true, // This option allows Mongo DB to add a createdAt and updatedAt properties to a document. This helps in returning sorted response.
 });
+
+userSchema.methods.createJwtToken = function() {
+    const authToken = jwtToken.sign({ _id: this._id }, "Sarthak@1234", { expiresIn: "1d" });
+
+    return authToken;
+};
+
+userSchema.methods.validatePassword = async function(userInputPassword) {
+    const savedPasswordHash = this.password;
+
+    return await bcrypt.compare(userInputPassword, savedPasswordHash);
+}
 
 /**
  * Create a Mongoose model.
