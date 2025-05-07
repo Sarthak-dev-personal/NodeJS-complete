@@ -13,6 +13,7 @@ const authenticateUser = require("./middlewares/userAuth");
 // Router imports.
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 // Route all the requests through defined routers instead of having all the methods in the app.js.
 app.use("/", authRouter);
 app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 /**
  * API to delete a particular user.

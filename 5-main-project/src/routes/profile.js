@@ -4,6 +4,7 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 
 const authenticateUser = require("../middlewares/userAuth");
+const encryptPassword = require("../utils/encrypt-password");
 
 const profileRouter = express.Router();
 
@@ -118,7 +119,7 @@ profileRouter.patch("/profile/password", authenticateUser, async(request, respon
             throw new Error("Existing password is incorrect!!");
         }
 
-       loggedInUser.password = newPassword;
+       loggedInUser.password = await encryptPassword(newPassword);
 
        const updatedUser = await loggedInUser.save();
 
