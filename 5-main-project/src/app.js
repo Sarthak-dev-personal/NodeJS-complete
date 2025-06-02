@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 // Model Imports.
 const UserModel = require('./models/user');
@@ -26,6 +27,12 @@ app.use(express.json()); // Equivalent to app.use('/', express.json());
 
 // Middleware to parse the cookies sent for all the requests from the client.
 app.use(cookieParser());
+
+// Middleware to handle CORS issues from the backend itself.
+app.use(cors({
+    origin: "http://localhost:5173", // Whitelist the origin from which the request is received.
+    credentials: true, // Send cookies even on non http networks.
+}));
 
 // Route all the requests through defined routers instead of having all the methods in the app.js.
 app.use("/", authRouter);
