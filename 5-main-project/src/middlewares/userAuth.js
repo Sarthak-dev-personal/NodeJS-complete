@@ -20,7 +20,9 @@ const authenticateUser = async (request, response, next) => {
         const { authToken } = authenticationCookie;
 
         if (!authToken) {
-            throw new Error("Valid token missing!!");
+            return response.status(401).json({
+                message: "User not logged in!!",
+            })
         }
 
         const decodedMessage = jwt.verify(authToken, "Sarthak@1234");
