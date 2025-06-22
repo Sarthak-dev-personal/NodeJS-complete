@@ -8,7 +8,7 @@ const UserModel = require("../models/user");
 const userRouter = express.Router();
 
 // Fields acceptable to return in connection response.
-const ACCEPTABLE_FIELDS_IN_RESPONSE = ["firstName", "lastName", "age", "gender", "skills", "about"];
+const ACCEPTABLE_FIELDS_IN_RESPONSE = ["firstName", "lastName", "age", "gender", "skills", "about", "photoUrl"];
 
 userRouter.get("/user/requests/received", authenticateUser, async(request, response) => {
     try {
