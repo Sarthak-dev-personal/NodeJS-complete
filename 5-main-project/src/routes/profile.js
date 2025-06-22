@@ -45,7 +45,7 @@ profileRouter.get('/profile/view', authenticateUser, async (request, response) =
          */
         const user = request.user; // We are adding the user object to the request body in the userAuth middleware code.
 
-        response.json({ data: user });
+        response.json(user);
     } catch (error) {
         response.send(error.message);
     }
