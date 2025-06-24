@@ -81,8 +81,6 @@ requestRouter.post("/request/review/:status/:requestId", authenticateUser, async
 
         existingConnectionRequest.status =  `${status}ed`;
 
-        console.log(existingConnectionRequest.status);
-
         const data = await existingConnectionRequest.save();
 
         response.json({

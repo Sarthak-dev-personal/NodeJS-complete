@@ -47,6 +47,9 @@ authRouter.post('/signup', async (request, response) => {
 
             const user = await newUser.save(); // Push Data in the collection.
 
+            const authToken = jwt.sign({ _id: user._id }, "Sarthak@1234", { expiresIn: "7d" });
+            response.cookie("authToken", authToken, { httpOnly: true, expires: new Date(Date.now() + 60 * 60 * 1000) });
+
             response.json({
                 message: `Congratulations ${newUser.firstName}, you're signed up sucessfully!!`,
                 data: user,
